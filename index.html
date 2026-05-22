@@ -17,7 +17,7 @@
     <nav class="bg-gradient-custom p-4 shadow-lg text-white">
         <div class="container mx-auto flex justify-between items-center">
             <h1 class="text-2xl font-bold italic"><i class="fas fa-magic mr-2"></i>KartCini</h1>
-            <span class="text-sm opacity-80 italic">Akıllı Kampanya Rehberiniz</span>
+            <span class="text-sm opacity-80 italic">Akıllı Kampanya Rehberiniz v12.33</span>
         </div>
     </nav>
 
@@ -92,40 +92,47 @@
             searchForm.dispatchEvent(new Event('submit'));
         }
 
+        // HAFIZA BURADA TUTULUYOR
+        let chatHistory = []; 
+
         searchForm.onsubmit = async (e) => {
             e.preventDefault();
             const query = userQuery.value.trim();
             if(!query) return;
 
-            // UI hazırlığı
-            addMessage(query, true);
+            addMessage(query, true); // Kullanıcı mesajını ekrana bas
             userQuery.value = "";
-            sendBtn.disabled = true;
-            addMessage("KartCini düşünüyor... ✨");
+            addMessage("Cini düşünüyor... ✨");
 
             try {
                 const response = await fetch(API_URL, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ query: query })
+                    body: JSON.stringify({ 
+                        query: query,
+                        history: chatHistory // GEÇMİŞİ GÖNDER
+                    })
                 });
 
                 const data = await response.json();
-                
-                // Son bot mesajını sil (düşünüyor yazısını)
+
+                // "Düşünüyor" mesajını sil
                 chatWindow.lastChild.remove();
 
                 // Gemini yanıtını bas
                 addMessage(data.llm_answer);
 
-                // Referans kampanyaları kart olarak göster
-                showCampaignCards(data.retrieved_campaigns);
+                // HAFIZAYI GÜNCELLE
+                chatHistory = data.history;
+
+                // Eğer kampanya geldiyse kartları göster
+                if(data.retrieved_campaigns && data.retrieved_campaigns.length > 0) {
+                    showCampaignCards(data.retrieved_campaigns);
+                }
 
             } catch (error) {
-                addMessage("Üzgünüm, bir bağlantı hatası oluştu. Lütfen tekrar dene.");
+                addMessage("Bağlantı hatası!");
                 console.error(error);
-            } finally {
-                sendBtn.disabled = false;
             }
         };
 
