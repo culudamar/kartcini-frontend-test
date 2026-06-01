@@ -107,7 +107,7 @@
             </div>
 
             <!-- Model Seçim Kutusu -->
-            <select id="modelSelect" onchange="saveModelChoice()" class="ml-2 bg-gray-50 border border-purple-200 text-gray-700 text-[10px] rounded-lg focus:ring-purple-500 focus:border-purple-500 p-1 font-bold outline-none">
+            <select id="modelSelect" onchange="saveModelChoice()" class="ml-2 bg-gray-50 border border-purple-200 text-gray-700 text-[10px] rounded-lg focus:ring-purple-500 focus:border-purple-500 p-1">
                 <option value="gemini-2.5-flash">Gemini 2.5 Flash (Hızlı&Öfkeli)</option>
                 <option value="gemini-3.1-flash-lite">Gemini 3.1 Flash Lite (2.5 olmazsa)</option>
                 <option value="gemma-4-26b-a4b-it">Gemma 4 26B (Yavaş&Sabırlı)</option>
@@ -364,10 +364,10 @@
                 // Başarılı yanıt: Hafızayı güncelle ve placeholder değiştir
                 // --- KENDİ AJANIM MODU ÖZEL UI ---
                 if (selectedModel === "my-agent") {
-                    addMessage("✨ Kampanya verilerini senin için hazırladım! Aşağıdaki butonu kullanarak kendi yapay zeka asistanınla (Gemini, ChatGPT vb.) paylaşabilirsin. Sonrasında sohbetine kendi ajanınla devam edebilirsin.");
+                    addMessage("✨ Kampanya verilerini senin için hazırladım! Aşağıdaki butonu kullanarak verileri indirebilir ve kendi yapay zeka asistanınıza yükleyebilirsiniz.");
                     
-                    // Paylaş butonu ekle
-                    showShareButton(data.llm_answer);
+                    // İndir butonu ekle
+                    showDownloadButton(data.llm_answer);
 
                     // Ajan modunda tek seferlik veri çekimi daha güvenlidir:
                     userQuery.disabled = true;
@@ -410,33 +410,30 @@
             }
         }
 
-        // Modern Paylaşım Butonu Fonksiyonu
-        function showShareButton(textToShare) {
+        /**
+         * İndir butonu - Kampanya verilerini dosya olarak indir
+         */
+        function showDownloadButton(textToDownload) {
             const div = document.createElement('div');
             div.className = "flex justify-center my-4";
             
-            const btn = document.createElement('button');
-            btn.className = "bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-6 rounded-full shadow-lg flex items-center transition transform hover:scale-105";
-            btn.innerHTML = `<i class="fas fa-share-alt mr-2"></i> Ajana Gönder`;
+            const downloadBtn = document.createElement('button');
+            downloadBtn.type = 'button';
+            downloadBtn.className = "bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-6 rounded-full shadow-lg flex items-center transition transform hover:scale-105";
+            downloadBtn.innerHTML = `<i class="fas fa-download mr-2"></i> Verileri İndir`;
             
-            btn.onclick = async () => {
-                if (navigator.share) {
-                    try {
-                        await navigator.share({
-                            title: 'KartCini Kampanya Verileri',
-                            text: textToShare
-                        });
-                    } catch (err) {
-                        console.log("Paylaşım iptal edildi veya hata oluştu");
-                    }
-                } else {
-                    // Web Share API desteklenmiyorsa kopyala
-                    navigator.clipboard.writeText(textToShare);
-                    alert("Paylaşım özelliği tarayıcında desteklenmiyor. Metin panoya kopyalandı!");
-                }
-            };
+            downloadBtn.addEventListener('click', () => {
+                const element = document.createElement('a');
+                const file = new Blob([textToDownload], {type: 'text/plain;charset=utf-8'});
+                element.href = URL.createObjectURL(file);
+                element.download = `kampanya-verileri-${new Date().getTime()}.txt`;
+                document.body.appendChild(element);
+                element.click();
+                document.body.removeChild(element);
+                URL.revokeObjectURL(element.href);
+            });
             
-            div.appendChild(btn);
+            div.appendChild(downloadBtn);
             chatWindow.appendChild(div);
             chatWindow.scrollTop = chatWindow.scrollHeight;
         }
