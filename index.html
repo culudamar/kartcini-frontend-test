@@ -80,7 +80,7 @@
                 <div class="flex flex-col">
                     <h1 class="text-xl md:text-2xl font-bold italic leading-none">KartCini</h1>
                     <!-- Slogan küçültüldü ve başlığın altına alındı -->
-                    <span class="text-[10px] md:text-xs opacity-70 italic mt-1 tracking-tight">Akıllı Kampanya Rehberiniz v1.0103</span>
+                    <span class="text-[10px] md:text-xs opacity-70 italic mt-1 tracking-tight">Akıllı Kampanya Rehberiniz v1.0226</span>
                 </div>
             </div>
 
@@ -456,7 +456,8 @@
                     method: 'POST',
                     headers: { 
                         'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${sessionToken}` // TOKEN BURADA GİDİYOR
+                        // Eğer sessionToken yoksa Authorization header'ını hiç ekleme veya boş bırak
+                        'Authorization': sessionToken ? `Bearer ${sessionToken}` : "" 
                     },
                     signal: controller.signal, // Controller'ı fetch'e bağlıyoruz
                     body: JSON.stringify({ 
