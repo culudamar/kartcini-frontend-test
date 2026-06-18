@@ -80,7 +80,7 @@
                 <div class="flex flex-col">
                     <h1 class="text-xl md:text-2xl font-bold italic leading-none">KartCini</h1>
                     <!-- Slogan küçültüldü ve başlığın altına alındı -->
-                    <span class="text-[10px] md:text-xs opacity-70 italic mt-1 tracking-tight">Akıllı Kampanya Rehberiniz v1.1319</span>
+                    <span class="text-[10px] md:text-xs opacity-70 italic mt-1 tracking-tight">Akıllı Kampanya Rehberiniz v1.1404</span>
                 </div>
             </div>
 
@@ -177,6 +177,7 @@
     <script>
         // API Adresi (Kendi Render URL'inle güncellediğinden emin ol)
         const API_URL = "https://animated-couscous-wp97jj7v7j25grg-8000.app.github.dev/search";
+        const SUPABASE_SCHEMA = "test";
         
         // Uygulama Durum Yönetimi (State)
         let chatHistory = [];      // Sohbet geçmişini (RAG hafızası) saklar
@@ -372,16 +373,19 @@
 
         const _supabase = supabase.createClient('https://jnphjmycmimgpdnctabe.supabase.co', 'sb_publishable_QNjdf_CpgMbpMwumVn7tiQ__l-IWZD3');
         let sessionToken = null;
+        let currentUserId = null;
         
         // Oturum kontrolü
         _supabase.auth.onAuthStateChange(async (event, session) => {
             if (session) {
                 sessionToken = session.access_token;
+                currentUserId = session.user.id; // ID'yi kaydet
                 document.getElementById('loginBtn').classList.add('hidden');
                 document.getElementById('userProfile').classList.remove('hidden');
                 updateQuotaDisplay(session.user.id);
             } else {
                 sessionToken = null;
+                currentUserId = null;
                 document.getElementById('loginBtn').classList.remove('hidden');
                 document.getElementById('userProfile').classList.add('hidden');
             }
@@ -400,7 +404,7 @@
 
         async function updateQuotaDisplay(userId) {
             // test şemasından kotayı çek
-            const { data } = await _supabase.schema('test').from('Profile').select('*').eq('id', userId).single();
+            const { data } = await _supabase.schema(SUPABASE_SCHEMA).from('Profile').select('*').eq('id', userId).single();
             if (data) {
                 document.getElementById('usageBadge').innerText = `${data.usage_count} / ${data.max_limit} Hak`;
             }
@@ -464,6 +468,12 @@
                 }
 
                 // Başarılı yanıt: Hafızayı güncelle ve placeholder değiştir
+
+                // kotayı hemen güncelle:
+                if (currentUserId) {
+                    updateQuotaDisplay(currentUserId);
+                }
+                
                 // --- KENDİ AJANIM MODU ÖZEL UI ---
                 if (selectedModel === "my-agent") {
                     addMessage("✨ Kampanya verilerini senin için hazırladım! Aşağıdaki butonu kullanarak verileri indirebilir ve kendi yapay zeka asistanınıza yükleyebilirsiniz. Yeni bir arama yapmak için sayfayı yenileyin.");
