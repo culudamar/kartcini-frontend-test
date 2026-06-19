@@ -95,7 +95,7 @@
                 <div class="flex flex-col">
                     <h1 class="text-xl md:text-2xl font-bold italic leading-none">KartCini</h1>
                     <!-- Slogan küçültüldü ve başlığın altına alındı -->
-                    <span class="text-[10px] md:text-xs opacity-70 italic mt-1 tracking-tight">Akıllı Kampanya Rehberiniz v1.1834</span>
+                    <span class="text-[10px] md:text-xs opacity-70 italic mt-1 tracking-tight">Akıllı Kampanya Rehberiniz v1.1847</span>
                 </div>
             </div>
 
@@ -453,6 +453,9 @@
         async function performSearch(query) {
             const modelSelect = document.getElementById('modelSelect');
             const selectedModel = modelSelect.value; 
+
+            // --- ÖLÇÜM BAŞLANGICI ---
+            const startTime = performance.now(); 
             
             gtag('event', 'search_initiated', {
                 'query_text': query,
@@ -497,6 +500,22 @@
                 clearTimeout(timeoutId);
         
                 const data = await response.json();
+
+                // --- ÖLÇÜM BİTİŞİ VE HESAPLAMA ---
+                const endTime = performance.now();
+                const durationSec = parseFloat(((endTime - startTime) / 1000).toFixed(2)); // Saniyeye çevir
+        
+                // Google Analytics'e Gönder
+                gtag('event', 'search_performance', {
+                    'model_id': selectedModel,
+                    'wait_time_sec': durationSec,      // Bekleme süresi (Örn: 3.45)
+                    'status': response.ok ? 'success' : 'error',
+                    'error_code': response.ok ? null : response.status
+                });
+        
+                // Loglarda da görelim (Debug için)
+                console.log(`⏱️ API Yanıt Süresi: ${durationSec} saniye [Model: ${selectedModel}]`);
+                
                 const indicator = document.getElementById('typingIndicator');
                 if (indicator) indicator.remove(); // Typing bitti
         
@@ -576,7 +595,13 @@
                 if(data.retrieved_campaigns) showCampaignCards(data.retrieved_campaigns);
         
             } catch (error) {
-                gtag('event', 'error_encountered', {
+                // Hata durumunda da süreyi ölçelim (Kullanıcı ne kadar bekleyip hata aldı?)
+                const endTime = performance.now();
+                const durationSec = parseFloat(((endTime - startTime) / 1000).toFixed(2));
+                
+                gtag('event', 'search_performance', {
+                    'model_id': selectedModel,
+                    'wait_time_sec': durationSec,
                     'error_status': response.status,
                     'error_message': error.name || data.detail || data.message
                 });
