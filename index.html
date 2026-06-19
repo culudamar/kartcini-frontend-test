@@ -95,7 +95,7 @@
                 <div class="flex flex-col">
                     <h1 class="text-xl md:text-2xl font-bold italic leading-none">KartCini</h1>
                     <!-- Slogan küçültüldü ve başlığın altına alındı -->
-                    <span class="text-[10px] md:text-xs opacity-70 italic mt-1 tracking-tight">Akıllı Kampanya Rehberiniz v1.1647</span>
+                    <span class="text-[10px] md:text-xs opacity-70 italic mt-1 tracking-tight">Akıllı Kampanya Rehberiniz v1.1834</span>
                 </div>
             </div>
 
@@ -172,7 +172,7 @@
                 <option value="gemini-3.1-flash-lite">Gemini 3.1 Flash Lite (2.5 olmazsa)</option>
                 <option value="gemma-4-26b-a4b-it">Gemma 4 26B (Yavaş&Sabırlı)</option>
             </select>
-            <a href="https://kreosus.com/kartcinicom" target="_blank" 
+            <a href="https://kreosus.com/kartcinicom" target="_blank" onclick="trackCoffeeClick('fixed_button')"
                class="inline-flex items-center bg-white border border-orange-300 text-orange-600 px-3 py-1 rounded-full text-[10px] font-bold hover:bg-orange-50 transition ml-auto">
                 <i class="fas fa-heart mr-1"></i> Kahve Ismarla
             </a>
@@ -518,7 +518,7 @@
                         bubbleContent = `🚫 ${serverError}
                             <div class="mt-3 pt-2 border-t border-purple-200">
                                 <p class="text-[10px] mb-2 italic text-gray-500">Geliştirici limitleri artırmama yardımcı ol:</p>
-                                <a href="https://kreosus.com/kartcinicom" target="_blank" class="inline-block bg-orange-500 text-white px-3 py-1 rounded-full text-[10px] font-bold shadow-sm hover:bg-orange-600 transition">
+                                <a href="https://kreosus.com/kartcinicom" target="_blank"  onclick="trackCoffeeClick('error_bubble')" class="inline-block bg-orange-500 text-white px-3 py-1 rounded-full text-[10px] font-bold shadow-sm hover:bg-orange-600 transition">
                                     <i class="fas fa-coffee mr-1"></i> Kahve Ismarla
                                 </a>
                             </div>`;
@@ -680,6 +680,13 @@
                 }
             }
         });
+        // Kahve tıklamasını ölçen özel fonksiyon
+        function trackCoffeeClick(location) {
+            gtag('event', 'support_click', {
+                'click_location': location, // 'fixed_button' veya 'error_bubble'
+                'is_logged_in': sessionToken ? 'yes' : 'no'
+            });
+        }
         
     </script>
 </body>
