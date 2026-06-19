@@ -1,6 +1,16 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-G0YC21LXFP"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+    
+      gtag('config', 'G-G0YC21LXFP');
+    </script>
+    
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>KartCini | Akıllı Kampanya Asistanı</title>
@@ -85,7 +95,7 @@
                 <div class="flex flex-col">
                     <h1 class="text-xl md:text-2xl font-bold italic leading-none">KartCini</h1>
                     <!-- Slogan küçültüldü ve başlığın altına alındı -->
-                    <span class="text-[10px] md:text-xs opacity-70 italic mt-1 tracking-tight">Akıllı Kampanya Rehberiniz v1.1041</span>
+                    <span class="text-[10px] md:text-xs opacity-70 italic mt-1 tracking-tight">Akıllı Kampanya Rehberiniz v1.1647</span>
                 </div>
             </div>
 
@@ -388,6 +398,10 @@
             const modelSelect = document.getElementById('modelSelect');
             
             if (session) {
+                gtag('event', 'login', { 'method': 'Google' });
+                // Kullanıcı ID'sini GA'ya bağla (User-ID takibi için)
+                gtag('set', {'user_id': session.user.id});
+                
                 sessionToken = session.access_token;
                 currentUserId = session.user.id; // ID'yi kaydet
                 document.getElementById('loginBtn').classList.add('hidden');
@@ -440,6 +454,15 @@
             const modelSelect = document.getElementById('modelSelect');
             const selectedModel = modelSelect.value; 
             
+            gtag('event', 'search_initiated', {
+                'query_text': query,
+                'query_length': query.length,               // Sorgu uzunluğu
+                'is_logged_in': sessionToken ? 'yes' : 'no', // Giriş yapmış mı?
+                'selected_model': selectedModel,
+                'bank_count': selectedBanks.length,        // Kaç banka filtrelenmiş?
+                'selected_banks': selectedBanks.join(',')
+            });
+            
             // Eğer Gemini seçiliyse ama giriş yapılmamışsa uyar
             if (selectedModel !== "my-agent" && !sessionToken) {
                 addMessage("💬 Giriş yapmadan sadece 'Kendi Ajanını' kullanabilirsin. Sağ üstten giriş yaparak ücretsiz günlük limitin dahilinde isteğin modeli kullanabilirsin.");
@@ -478,6 +501,11 @@
                 if (indicator) indicator.remove(); // Typing bitti
         
                 if (!response.ok) {
+                    gtag('event', 'error_encountered', {
+                        'error_status': response.status,
+                        'error_message': data.detail || data.message
+                    });
+                    
                     // --- BACKEND'DEN GELEN MESAJI OKU ---
                     // detail (standard FastAPI) veya message (bizim custom)
                     let serverError = data.detail || data.message || "KartCini şu an cevap veremiyor.";
@@ -548,6 +576,11 @@
                 if(data.retrieved_campaigns) showCampaignCards(data.retrieved_campaigns);
         
             } catch (error) {
+                gtag('event', 'error_encountered', {
+                    'error_status': response.status,
+                    'error_message': error.name || data.detail || data.message
+                });
+                
                 // ZAMAN AŞIMI HATASI KONTROLÜ
                 if (error.name === 'AbortError') {
                     addMessage("<i class='fas fa-clock mr-2 text-orange-500'></i> Yanıt süresi çok uzadı. Gemma şu an yoğun olabilir, lütfen tekrar deneyin.");
@@ -577,6 +610,10 @@
             downloadBtn.innerHTML = `<i class="fas fa-download mr-2"></i> Verileri İndir`;
             
             downloadBtn.addEventListener('click', () => {
+                gtag('event', 'share_with_agent', {
+                    'content_type': 'campaign_data'
+                });
+                
                 const element = document.createElement('a');
                 const file = new Blob([textToDownload], {type: 'text/plain;charset=utf-8'});
                 element.href = URL.createObjectURL(file);
@@ -618,6 +655,32 @@
                 }
             }, 1000);
         }
+
+        // Dinamik olarak oluşturulan linkleri izlemek için global dinleyici
+        document.addEventListener('click', function(e) {
+            // Tıklanan element bir link mi veya bir linkin içinde mi?
+            const targetLink = e.target.closest('a');
+            
+            if (targetLink && targetLink.href) {
+                // Sadece bizim kampanya alanlarımızdaki linkleri izleyelim
+                const isChatLink = targetLink.closest('#chatWindow');
+                const isCardLink = targetLink.closest('#campaignList');
+        
+                if (isChatLink || isCardLink) {
+                    const location = isChatLink ? 'chat_bubble' : 'campaign_card';
+                    
+                    // Google Analytics'e gönder
+                    gtag('event', 'campaign_click', {
+                        'link_url': targetLink.href,        // Hangi URL'e gidildi?
+                        'link_text': targetLink.innerText.substring(0, 40), // Link metni (ilk 40 karakter)
+                        'click_location': location         // Chat içinden mi karttan mı?
+                    });
+                    
+                    console.log(`📊 İzleme: ${location} üzerinden linke tıklandı.`);
+                }
+            }
+        });
+        
     </script>
 </body>
 </html>
