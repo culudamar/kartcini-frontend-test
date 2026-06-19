@@ -68,6 +68,11 @@
         }
     </style>
 </head>
+<script>
+    // API Adresi (Kendi Render URL'inle güncellediğinden emin ol)
+    const API_URL = "https://potential-fiesta-jg6q9wrjpj4fj6v4-8000.app.github.dev/search";
+    const SUPABASE_SCHEMA = "test";
+</script>
 <body class="bg-gray-100 font-sans leading-normal tracking-normal">
 
     <!-- Navigasyon Alanı: Yeniden Yapılandırıldı -->
@@ -80,7 +85,7 @@
                 <div class="flex flex-col">
                     <h1 class="text-xl md:text-2xl font-bold italic leading-none">KartCini</h1>
                     <!-- Slogan küçültüldü ve başlığın altına alındı -->
-                    <span class="text-[10px] md:text-xs opacity-70 italic mt-1 tracking-tight">Akıllı Kampanya Rehberiniz v1.0226</span>
+                    <span class="text-[10px] md:text-xs opacity-70 italic mt-1 tracking-tight">Akıllı Kampanya Rehberiniz v1.1013</span>
                 </div>
             </div>
 
@@ -175,9 +180,6 @@
     </div>
 
     <script>
-        // API Adresi (Kendi Render URL'inle güncellediğinden emin ol)
-        const API_URL = "https://kartcini-api.onrender.com/search";
-        const SUPABASE_SCHEMA = "public";
         
         // Uygulama Durum Yönetimi (State)
         let chatHistory = [];      // Sohbet geçmişini (RAG hafızası) saklar
