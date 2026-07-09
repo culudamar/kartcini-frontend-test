@@ -106,9 +106,9 @@
 </head>
 <script>
     // API Adresi (Kendi Render URL'inle güncellediğinden emin ol)
-    //const API_URL = "https://kartcini-api.onrender.com/search";
-    const API_URL = "https://psychic-journey-gp976wx4pj4hw49r-8000.app.github.dev/search";
-    const SUPABASE_SCHEMA = "test";
+    const API_URL = "https://kartcini-api.onrender.com/search";
+    //const API_URL = "https://psychic-journey-gp976wx4pj4hw49r-8000.app.github.dev/search";
+    const SUPABASE_SCHEMA = "public";
 </script>
 <body class="bg-gray-100 font-sans leading-normal tracking-normal">
 
@@ -122,7 +122,7 @@
                 <div class="flex flex-col">
                     <h1 class="text-xl md:text-2xl font-bold italic leading-none">KartCini</h1>
                     <!-- Slogan küçültüldü ve başlığın altına alındı -->
-                    <span class="text-[10px] md:text-xs opacity-70 italic mt-1 tracking-tight">Akıllı Kampanya Rehberiniz v1.1328</span>
+                    <span class="text-[10px] md:text-xs opacity-70 italic mt-1 tracking-tight">Akıllı Kampanya Rehberiniz v1.1511</span>
                 </div>
             </div>
 
@@ -598,7 +598,11 @@
                 
                 // --- KENDİ AJANIM MODU ÖZEL UI ---
                 if (selectedModel === "my-agent") {
-                    addMessage("✨ Kampanya verilerini senin için hazırladım! Aşağıdaki butonu kullanarak verileri indirebilir ve kendi yapay zeka asistanınıza yükleyebilirsiniz. Yeni bir arama yapmak için sayfayı yenileyin.");
+                    addMessage("✨ Kampanya verisi hazır! Aşağıdaki butonu kullanarak veriyi indirebilir ve kendi yapay zeka asistanınıza yükleyebilirsiniz. Yeni bir arama yapmak için sayfayı yenileyin.");
+                    
+                    if (!sessionToken)
+                        // giriş yapMAmış muhtemelen ilk kullanımı. Daha açıklayıcı bir mesaj daha ver:
+                        addMessage("✨ Giriş yaparak KartCini'ni daha kolay kullanabilirsiniz!");
                     
                     // İndir butonu ekle
                     showDownloadButton(data.llm_answer);
