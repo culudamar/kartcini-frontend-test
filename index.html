@@ -122,7 +122,7 @@
                 <div class="flex flex-col">
                     <h1 class="text-xl md:text-2xl font-bold italic leading-none">KartCini</h1>
                     <!-- Slogan küçültüldü ve başlığın altına alındı -->
-                    <span class="text-[10px] md:text-xs opacity-70 italic mt-1 tracking-tight">Akıllı Kampanya Rehberiniz v1.1106</span>
+                    <span class="text-[10px] md:text-xs opacity-70 italic mt-1 tracking-tight">Akıllı Kampanya Rehberiniz v1.1109</span>
                 </div>
             </div>
 
@@ -321,15 +321,6 @@
             return guestId;
         }
         
-        function getOrCreateGuestId() {
-            let guestId = localStorage.getItem('kartcini_guest_id');
-            if (!guestId) {
-                guestId = 'guest_' + Math.random().toString(36).substr(2, 9) + Date.now();
-                localStorage.setItem('kartcini_guest_id', guestId);
-            }
-            return guestId;
-        }
-        
         window.onload = () => {
             getOrCreateGuestId(); // Misafir kimliğini mühürle
             loadSavedBanks(); // issuer seçimini hatırla
@@ -481,9 +472,6 @@
                 currentUserId = null;
                 document.getElementById('loginBtn').classList.remove('hidden');
                 document.getElementById('userProfile').classList.add('hidden');
-                    
-                // Giriş yapılmamışsa varsayılan olarak 'Kendi Ajanım' moduna geri dön
-                modelSelect.value = "my-agent";
             }
         });
         
